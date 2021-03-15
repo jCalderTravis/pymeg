@@ -65,7 +65,8 @@ def get_info(raw_filename, epochs_filename):
 def get_leadfield(subject, raw_filename, epochs_filename, trans_filename,
                   conductivity=(0.3, 0.006, 0.3), njobs=4, 
                   bem_sub_path='bem', 
-                  sdir=None):
+                  sdir=None,
+                  tempBemFname=None):
     """Compute leadfield with presets for this subject
 
     Args:    
@@ -86,10 +87,16 @@ def get_leadfield(subject, raw_filename, epochs_filename, trans_filename,
         bem_sub_path: str
             Sub-path of freesurfer subject path where to read bem
             surfaces from
+        tempBemFname: str
+            Full file name including path in which to save a file 
+            containing BEM info. 
 
     Returns:   
         Tuple of (forward model, BEM model, source space)
     """
+    if tempBemFname is None:
+        raise Exception('tmpDemDir must be specified')
+
     if sdir is None:
         sdir = subjects_dir
 
@@ -101,6 +108,12 @@ def get_leadfield(subject, raw_filename, epochs_filename, trans_filename,
         subjects_dir=sdir,
         bem_sub_path=bem_sub_path)
     bem = mne.make_bem_solution(model)
+
+    # Workaround found by other lab members
+    mne.write_bem_solution(tempBemFname, bem)
+    del(bem)
+    bem = mne.read_bem_solution(tempBemFname)
+
     info = get_info(raw_filename, epochs_filename)
     fwd = mne.make_forward_solution(
         info,
