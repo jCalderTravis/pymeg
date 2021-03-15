@@ -283,17 +283,18 @@ def make_trans(subject, raw_filename, epoch_filename, trans_name, sdir=None, fid
     import time
     if fid_epochs is None:
         fid_epochs = get_trans_epoch(raw_filename, epoch_filename)
-    # cmd = 'mne coreg --high-res-head -d %s -s %s -f %s' % (
-    #    subjects_dir, subject, fid_epochs)
-    # print(cmd)
-    # os.system(cmd)
-    if sdir is None:
-        sdir = subjects_dir
-    mne.gui.coregistration(subject, inst=fid_epochs,
-                           subjects_dir=sdir)
+    cmd = 'mne coreg --high-res-head -d %s -s %s -f %s' % (
+       subjects_dir, subject, fid_epochs)
+    print(cmd)
     print('--------------------------------')
     print('Please save trans file as:')
     print(trans_name)
+    print('--------------------------------')
+    os.system(cmd)
+    # if sdir is None:
+    #     sdir = subjects_dir
+    # mne.gui.coregistration(subject, inst=fid_epochs,
+    #                        subjects_dir=sdir)
     while not os.path.isfile(trans_name):
         #print('Waiting for transformation matrix to appear')
         time.sleep(5)
@@ -342,8 +343,8 @@ def replace_fiducials(info, fiducials):
     Returns:
         Info structure with updated head position.
     """
-    from mne.io import meas_info
-    fids = meas_info._make_dig_points(**fiducials)
+    from mne.io import _digitization as digitization
+    fids = digitization._make_dig_points(**fiducials)
     info = info.copy()
     dig = info['dig']
     for i, d in enumerate(dig):
