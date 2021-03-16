@@ -466,4 +466,5 @@ def _apply_lcmv(data, filters, info, tmin, max_ori_out):
         tstep = 1.0 / info['sfreq']
         yield _make_stc(sol, vertices=filters['vertices'], tmin=tmin,
                         tstep=tstep, subject='NN', vector=vector,
-                        source_nn=filters['source_nn'])
+                        source_nn=filters['source_nn'],
+                        src_type=filters['src_type'])
