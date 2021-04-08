@@ -12,7 +12,7 @@ import mne
 import numpy as np
 import pandas as pd
 
-from .tools import hilbert
+from scipy.signal import hilbert
 
 
 def annotate_blinks(raw, threshold=10, acc_thresh=2000, Hz=1200, 
