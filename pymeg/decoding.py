@@ -22,13 +22,16 @@ from sklearn.model_selection import (
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
-from imblearn.over_sampling import RandomOverSampler
+# Commenting various modules here. This is a work around so can used some of
+#  the functions in here 
+# that don't require these modules without installing them. TODO Think of a better solution
+# from imblearn.over_sampling import RandomOverSampler
 
-from conf_analysis.behavior import metadata
-from conf_analysis.meg import preprocessing
+# from conf_analysis.behavior import metadata
+# from conf_analysis.meg import preprocessing
 
-from imblearn.pipeline import Pipeline
-from sklearn.metrics.scorer import make_scorer
+# from imblearn.pipeline import Pipeline
+# from sklearn.metrics.scorer import make_scorer
 from sklearn.metrics import roc_auc_score, mean_squared_error
 from sklearn.utils.multiclass import type_of_target
 from sklearn.feature_selection import SelectFromModel, SelectKBest
