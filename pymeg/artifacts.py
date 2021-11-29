@@ -95,11 +95,10 @@ def annotate_jumps(raw, cutoff=25, allowed_before_bad=np.inf):
             a.extend(k)
     arts = np.array(a)
     annotations = None
-    try:
-        if len(arts) > 0:
-            annotations = mne.Annotations(arts[:, 0], arts[:, 1], 'bad jump')
-    except IndexError:
-        pass
+
+    if len(arts) > 0:
+        annotations = mne.Annotations(arts[:, 0], arts[:, 1], 'bad jump')
+        
     return raw, annotations, z, jumps_per_channel
 
 
