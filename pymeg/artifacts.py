@@ -211,7 +211,7 @@ def detect_jumps(raw, cutoff=25):
     if not hasattr(raw, '_data'):
         logging.info('Loading data for muscle artifact detection')
         raw.load_data()
-    raw.pick_channels([x for x in raw.ch_names if x.startswith('M')])
+    raw.pick(['meg'])
     #filt = mne.filter.low_pass_filter(raw._data, raw.info['sfreq'], 1)
     filt = mne.filter.filter_data(
         raw._data, raw.info['sfreq'], l_freq=None, h_freq=1)
