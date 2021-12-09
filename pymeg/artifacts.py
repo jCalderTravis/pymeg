@@ -75,9 +75,15 @@ def annotate_cars(raw, cutoff=4.0, der_cutoff=7.):
     return annotations, z, d
 
 
-def annotate_jumps(raw, cutoff=25, allowed_before_bad=np.inf):
+def annotate_jumps(raw, cutoff=25, allowed_before_bad=np.inf, 
+                    excludeBads=False):
+    """
+    excludeBads: bool. If True, do not consider channels already marked as bad.
+    """
+
     logging.info('Annotating jump artifacts')
-    arts, z, jumps_per_channel = detect_jumps(raw.copy(), cutoff=cutoff)
+    arts, z, jumps_per_channel = detect_jumps(raw.copy(), cutoff=cutoff,
+                                                excludeBads=excludeBads)
     # Need to check for jumps_per_channel
     bads = [k for k, v in jumps_per_channel.items() if v >
             allowed_before_bad]
@@ -203,15 +209,21 @@ def detect_muscle(raw, cutoff=10, frequency_band=(110, 140)):
     return np.array(artifacts), zh
 
 
-def detect_jumps(raw, cutoff=25):
+def detect_jumps(raw, cutoff=25, excludeBads=False):
     '''
     Detect jumps by convolving with a jump detection filter.
+
+    excludeBads: bool. If True, do not consider channels already marked as bad.
     '''
     logging.info('Detecting muscle events with cutoff %i' % cutoff)
     if not hasattr(raw, '_data'):
         logging.info('Loading data for muscle artifact detection')
         raw.load_data()
-    raw.pick(['meg'])
+
+    if excludeBads:
+        raw.pick(['meg'], exclude='bads')
+    else:
+        raw.pick(['meg'])
     #filt = mne.filter.low_pass_filter(raw._data, raw.info['sfreq'], 1)
     filt = mne.filter.filter_data(
         raw._data, raw.info['sfreq'], l_freq=None, h_freq=1)
