@@ -337,7 +337,8 @@ def apply_lcmv(tfrdata, est_key, est_vals, events, times, info,
     nfreqs = tfrdata.shape[2]
     assert(len(est_vals) == nfreqs)
     # ntrials = tfrdata.shape[0]
-    info['sfreq'] = 1. / np.diff(times)[0]
+    with info._unlock():
+        info['sfreq'] = 1. / np.diff(times)[0]
     results = []
     for freq, (roi, filter) in product(range(nfreqs), filters.items()):
         if filter['weights'].size > 0:
