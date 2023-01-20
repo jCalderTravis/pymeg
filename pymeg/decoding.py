@@ -238,7 +238,9 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
         )
 
         nfreqs = epochs.shape[2]
-        info["sfreq"] = 1.0 / np.diff(tfrtimes)[0]
+        with info._unlock():
+            info["sfreq"] = 1.0 / np.diff(tfrtimes)[0]
+        assert info["sfreq"] == (1.0 / np.diff(tfrtimes)[0])
         eres = []
         for freq in range(nfreqs):
             filter = flt[list(flt.keys())[0]]
