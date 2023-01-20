@@ -27,9 +27,15 @@ default_tfr = {'foi': fois, 'cycles': fois * 0.1, 'time_bandwidth': 2,
                'n_jobs': 1, 'est_val': fois, 'est_key': 'F'}
 
 
-def complex_tfr(x, time, est_val=None, est_key=None, sf=600., foi=None,
+def complex_tfr(x, time, est_val=None, est_key=None, sf=None, foi=None,
                 cycles=None, time_bandwidth=None, n_jobs=1, decim=10):
     """Estimate power of epochs in array x."""
+
+    if sf is None:
+        raise Exception('Sampling freq must be set')
+    if (1 / (time[1] - time[0])) != sf:
+        raise Exception('Probably a bug')
+
     if len(x.shape) == 2:
         x = x[np.newaxis, :, :]
     y = _compute_tfr(

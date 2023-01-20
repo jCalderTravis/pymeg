@@ -241,7 +241,9 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
         info["sfreq"] = 1.0 / np.diff(tfrtimes)[0]
         eres = []
         for freq in range(nfreqs):
-            filter = flt[list(flt.keys())[0]]
+            relKeys = list(flt.keys())
+            assert len(relKeys) == 1
+            filter = flt[relKeys[0]]
             mne.set_log_level("ERROR")
             data = np.stack(
                 [
