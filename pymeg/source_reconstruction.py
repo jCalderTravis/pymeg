@@ -249,7 +249,7 @@ def labels_remove_overlap(labels, priority_filters=['wang', 'JWG'],):
     print('vertices new:  {}'.format(vertices_nr_new))
     print('excluded: {}'.format(vertices_nr_ori - vertices_nr_new))
 
-    return labels_no_overlap
+    return labels_no_overlap, vertices_nr_ori, vertices_nr_new
 
 
 '''
