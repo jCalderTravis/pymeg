@@ -42,6 +42,11 @@ def complex_tfr(x, time, est_val=None, est_key=None, sf=None, foi=None,
         x, foi, sfreq=sf, method='multitaper', decim=decim, n_cycles=cycles,
         zero_mean=True, time_bandwidth=time_bandwidth, n_jobs=n_jobs,
         use_fft=True, output='complex')
+    
+    # Expect shape of (n_epochs, n_chans, n_freqs, n_times), check don't also
+    # have a dimension for tapers, as in newer versions of MNE
+    assert np.ndim(y) == 4, 'See comment in code'
+
     return y, time[::decim], est_val, est_key
 
 
