@@ -33,7 +33,7 @@ def complex_tfr(x, time, est_val=None, est_key=None, sf=None, foi=None,
 
     if sf is None:
         raise Exception('Sampling freq must be set')
-    if (1 / (time[1] - time[0])) != sf:
+    if not np.isclose(sf, (1 / (time[1] - time[0])), rtol=0):
         raise Exception('Probably a bug')
 
     if len(x.shape) == 2:
