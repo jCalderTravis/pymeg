@@ -20,7 +20,7 @@ import pickle
 
 from mne import compute_covariance
 
-memory = Memory(cachedir=os.environ["PYMEG_CACHE_DIR"])
+memory = Memory(location=os.environ["PYMEG_CACHE_DIR"])
 
 # Epochs
 epochs_path = Path("/home/nwilming/seqconf")

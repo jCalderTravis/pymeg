@@ -37,7 +37,7 @@ sns.set(style='ticks', font='Arial', font_scale=1, rc={
     'ytick.color':'Black',} )
 sns.plotting_context()
 
-memory = Memory(cachedir=os.environ['PYMEG_CACHE_DIR'], verbose=0)
+memory = Memory(location=os.environ['PYMEG_CACHE_DIR'], verbose=0)
 
 # data_folder = '/home/jw/share/data/'
 # fig_folder = '/home/jw/share/figures/'

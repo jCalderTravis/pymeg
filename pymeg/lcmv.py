@@ -17,7 +17,7 @@ from mne.beamformer import make_lcmv
 from mne.time_frequency.tfr import _compute_tfr
 
 
-memory = Memory(cachedir=os.environ['PYMEG_CACHE_DIR'], verbose=0)
+memory = Memory(location=os.environ['PYMEG_CACHE_DIR'], verbose=0)
 
 # backend = 'loky'
 backend = 'multiprocessing'

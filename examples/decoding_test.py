@@ -45,7 +45,7 @@ from joblib import Memory
 from os.path import expanduser
 
 home = expanduser("~")
-memory = Memory(cachedir=path.join(home, 'cache_pymeg'), verbose=0)
+memory = Memory(location=path.join(home, 'cache_pymeg'), verbose=0)
 
 '''
 First set up some general info to load the data.

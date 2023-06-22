@@ -23,7 +23,7 @@ import pandas as pd
 from conf_analysis.behavior import metadata
 from joblib import Memory
 
-memory = Memory(cachedir=os.environ['PYMEG_CACHE_DIR'], verbose=0)
+memory = Memory(location=os.environ['PYMEG_CACHE_DIR'], verbose=0)
 
 # Define visual field clusters:
 #   keys are cluster names, values uniquely identify ROIs in Wang

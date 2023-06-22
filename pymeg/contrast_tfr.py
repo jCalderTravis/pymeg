@@ -8,7 +8,7 @@ import logging
 
 from pymeg import atlas_glasser
 
-memory = Memory(cachedir=os.environ["PYMEG_CACHE_DIR"], verbose=0)
+memory = Memory(location=os.environ["PYMEG_CACHE_DIR"], verbose=0)
 
 backend = "loky"
 # backend = 'multiprocessing'

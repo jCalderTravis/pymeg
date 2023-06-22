@@ -8,7 +8,7 @@ from joblib import Memory
 from . import preprocessing
 
 
-memory = Memory(cachedir=os.environ['PYMEG_CACHE_DIR'], verbose=0)
+memory = Memory(location=os.environ['PYMEG_CACHE_DIR'], verbose=0)
 subjects_dir = os.environ['SUBJECTS_DIR']
 
 

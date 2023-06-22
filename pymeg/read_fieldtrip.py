@@ -11,7 +11,7 @@ from mne import create_info
 from mne.epochs import EpochsArray
 
 
-memory = Memory(cachedir=os.environ['PYMEG_CACHE_DIR'], verbose=0)
+memory = Memory(location=os.environ['PYMEG_CACHE_DIR'], verbose=0)
 
 
 def fix_chs(rawinfo, einfo):

@@ -18,7 +18,7 @@ home = expanduser("~")
 
 from joblib import Memory
 import os
-memory = Memory(cachedir=os.environ['PYMEG_CACHE_DIR'], verbose=0)
+memory = Memory(location=os.environ['PYMEG_CACHE_DIR'], verbose=0)
 
 try:
     import seaborn as sns

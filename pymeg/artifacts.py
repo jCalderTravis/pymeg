@@ -97,7 +97,7 @@ def annotate_jumps(raw, cutoff=25, allowed_before_bad=np.inf,
             raw.info['bads'] = bads
     a = []
     for k in arts:
-        if len(k) is not 0:
+        if len(k) != 0:
             a.extend(k)
     arts = np.array(a)
     annotations = None

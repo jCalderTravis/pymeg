@@ -15,7 +15,7 @@ from pymeg import source_reconstruction as sr
 import pandas as pd
 import pickle
 
-memory = Memory(cachedir=os.environ['PYMEG_CACHE_DIR'])
+memory = Memory(location=os.environ['PYMEG_CACHE_DIR'])
 #path = '/home/gprat/cluster_archive/Master_Project/preprocessed_megdata'
 path = '/mnt/archive/genis/Master_Project/preprocessed_megdata'
 
