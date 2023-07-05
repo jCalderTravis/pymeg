@@ -329,6 +329,7 @@ def get_ref_head_pos(filename,  trans, N=-1):
     """
     from mne.transforms import apply_trans
     data = preprocessing.load_epochs([filename])[0]
+    data.filter(l_freq=None, h_freq=10)
     cc = head_loc(data.decimate(10))
     nasion = np.stack([c[0] for c in cc[:N]]).mean(0)
     lpa = np.stack([c[1] for c in cc[:N]]).mean(0)
