@@ -271,31 +271,47 @@ def get_head_correct_info(raw_filename, epoch_filename, N=-1):
     return trans, fiducials, info
 
 
-def get_trans_epoch(raw_filename, epoch_filename):
+def get_trans_epoch(raw_filename, epoch_filename, replaceFids=True):
+    """
+    INPUT
+    replaceFids: bool. If true, attempt to replace the locations of the 
+        fiducials with more accurate locations based on epoch data.
+    """
+
     from os.path import join
     save_path = os.environ['PYMEG_CACHE_DIR']
     save_file = join(save_path,
                      epoch_filename.split("/")[-1]
                      .replace(".fif", "")
                      .replace(".gz", "") + "-trans.fif")
-    if os.path.isfile(save_file):
-        return save_file
-    trans, fiducials, info = get_head_correct_info(
-        raw_filename, epoch_filename)
+    
+    if replaceFids:
+        trans, fiducials, info = get_head_correct_info(
+                                                raw_filename, epoch_filename)
+    else:
+        raw = mne.io.ctf.read_raw_ctf(raw_filename)
+        info = raw.info
 
+    breakpoint()
     mne.io.meas_info.write_info(save_file, info)
     return save_file
 
 
-def make_trans(subject, raw_filename, epoch_filename, trans_name, sdir=None, fid_epochs=None):
+def make_trans(subject, raw_filename, epoch_filename, trans_name, sdir=None, 
+               fid_epochs=None, replaceFids=True):
     """Create coregistration between MRI and MEG space.
 
     Call MNE gui to create a MEG<>MRI transformation matrix
+
+    INPUT
+    replaceFids: bool. If true, attempt to replace the locations of the 
+        fiducials with more accurate locations based on epoch data.
     """
     import os
     import time
     if fid_epochs is None:
-        fid_epochs = get_trans_epoch(raw_filename, epoch_filename)
+        fid_epochs = get_trans_epoch(raw_filename, epoch_filename,
+                                        replaceFids=replaceFids)
     cmd = 'mne coreg --high-res-head -d %s -s %s -f %s' % (
        subjects_dir, subject, fid_epochs)
     print(cmd)
