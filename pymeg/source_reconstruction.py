@@ -292,7 +292,6 @@ def get_trans_epoch(raw_filename, epoch_filename, replaceFids=True):
         raw = mne.io.ctf.read_raw_ctf(raw_filename)
         info = raw.info
 
-    breakpoint()
     mne.io.meas_info.write_info(save_file, info)
     return save_file
 
