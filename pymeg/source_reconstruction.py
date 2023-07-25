@@ -72,10 +72,7 @@ def get_leadfield(subject, raw_filename, epochs_filename, trans_filename,
     Args:    
         subject : str
             Name of freesurfer subject
-        raw_filename : str
-            Filename that points to the raw data for this lead field.
-            This file will be used to extract a CTF transformation matrix
-            and an info struct.
+        raw_filename : None. No longer used.
         epochs_filename : str
             Filename from which fiducial locations will be extracted.
         trans_filename : str
@@ -94,6 +91,8 @@ def get_leadfield(subject, raw_filename, epochs_filename, trans_filename,
     Returns:   
         Tuple of (forward model, BEM model, source space)
     """
+    assert raw_filename is None, 'Parameter no longer used'
+
     if tempBemFname is None:
         raise Exception('tmpDemDir must be specified')
 
@@ -114,9 +113,9 @@ def get_leadfield(subject, raw_filename, epochs_filename, trans_filename,
     del(bem)
     bem = mne.read_bem_solution(tempBemFname)
 
-    info = get_info(raw_filename, epochs_filename)
+    epochs = mne.read_epochs(epochs_filename)
     fwd = mne.make_forward_solution(
-        info,
+        epochs.info,
         trans=trans_filename,
         src=src,
         bem=bem,
@@ -372,6 +371,7 @@ def replace_fiducials(info, fiducials):
     Returns:
         Info structure with updated head position.
     """
+    raise Exception('No longer in use. Update dev to head transform instead.')
     from mne.io import _digitization as digitization
     fids = digitization._make_dig_points(**fiducials)
     info = info.copy()
