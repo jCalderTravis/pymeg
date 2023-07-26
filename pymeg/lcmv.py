@@ -43,10 +43,13 @@ def complex_tfr(x, time, est_val=None, est_key=None, sf=None, foi=None,
         zero_mean=True, time_bandwidth=time_bandwidth, n_jobs=n_jobs,
         use_fft=True, output='complex')
     
-    # Expect shape of (n_epochs, n_chans, n_freqs, n_times), check don't also
-    # have a dimension for tapers, as in newer versions of MNE
-    assert np.ndim(y) == 4, 'See comment in code'
-
+    # Expect shape of (n_epochs, n_chans, n_tapers, n_freqs, n_times) from
+    # _compute_tfr for newer versions of MNE, but need 
+    # (n_epochs, n_chans, n_freqs, n_times)
+    assert np.ndim(y) == 5
+    assert y.shape[2] == 1
+    y = np.squeeze(y, axis=2)
+    
     return y, time[::decim], est_val, est_key
 
 

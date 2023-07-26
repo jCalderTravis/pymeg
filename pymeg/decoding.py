@@ -232,6 +232,7 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
         assert len(flt) == 1
         evs.append(epochs.events[:, 2])
         info = epochs.info
+        epochsChs = epochs.ch_names
 
         epochs, tfrtimes, est_val, est_key = complex_tfr(
             epochs._data[:,:,:], times, **tfr_params
@@ -246,6 +247,9 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
             relKeys = list(flt.keys())
             assert len(relKeys) == 1
             filter = flt[relKeys[0]]
+
+            assert epochsChs == filter['ch_names']
+
             mne.set_log_level("ERROR")
             data = np.stack(
                 [
