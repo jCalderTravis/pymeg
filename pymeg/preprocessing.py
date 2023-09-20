@@ -20,9 +20,7 @@ from __future__ import division, print_function
 import mne
 import numpy as np
 import pandas as pd
-from pymeg.tools import hilbert
 from pymeg import artifacts
-import logging
 from joblib import Memory
 import os
 

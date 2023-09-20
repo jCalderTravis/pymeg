@@ -19,8 +19,7 @@ from mne.time_frequency.tfr import _compute_tfr
 
 memory = Memory(location=os.environ['PYMEG_CACHE_DIR'], verbose=0)
 
-# backend = 'loky'
-backend = 'multiprocessing'
+backend = 'loky'
 
 fois = np.arange(10, 150, 5)
 default_tfr = {'foi': fois, 'cycles': fois * 0.1, 'time_bandwidth': 2,
