@@ -239,6 +239,8 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
 
     results = []
     evs = []
+    savedNewTimes = None
+
     for epochs, flt in zip(tfrdata, filters):
         assert len(flt) == 1
         evs.append(epochs.events[:, 2])
@@ -246,7 +248,7 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
         epochsChs = epochs.ch_names
 
         if mode == 'TF':
-            epochs, times, est_val, est_key = complex_tfr(
+            epochs, newTimes, est_val, est_key = complex_tfr(
                 epochs._data[:,:,:], times, **tfr_bb_params
             )
         elif mode == 'BB':
@@ -255,16 +257,19 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
 
             assert len(times) == epochs.shape[3]
             epochs = epochs[:, :, :, ::decim]
-            times = times[::decim]
-            assert len(times) == epochs.shape[3]
+            newTimes = times[::decim]
+            assert len(newTimes) == epochs.shape[3]
             est_val = np.asarray(['BB'])
         else:
             raise ValueError('Option unrecognised')
 
+        if savedNewTime is not None:
+            assert np.array_equal(savedNewTimes, newTimes)
+    
         nfreqs = epochs.shape[2]
         with info._unlock():
-            info["sfreq"] = 1.0 / np.diff(times)[0]
-        assert info["sfreq"] == (1.0 / np.diff(times)[0])
+            info["sfreq"] = 1.0 / np.diff(neTimes)[0]
+        assert info["sfreq"] == (1.0 / np.diff(newTimes)[0])
         eres = []
         for freq in range(nfreqs):
             relKeys = list(flt.keys())
@@ -281,7 +286,7 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
                         data=epochs[:, :, freq, :],
                         filters=filter,
                         info=info,
-                        tmin=times.min(),
+                        tmin=newTimes.min(),
                         max_ori_out=max_ori_out,
                     )
                 ]
@@ -289,7 +294,7 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
 
             eres.append(data)
         results.append(np.stack(eres, 1))
-    return np.vstack(results), np.concatenate(evs), est_val, times
+    return np.vstack(results), np.concatenate(evs), est_val, newTimes
 
 
 def multiclass_roc(y_true, y_predict, **kwargs):
