@@ -48,9 +48,20 @@ from pymeg.lcmv import complex_tfr, tfr2power_estimator
 njobs = 1
 
 
-def get_lcmv(tfr_params, epochs, filters, njobs=njobs):    
+def get_lcmv(tfr_bb_params, epochs, filters, njobs=njobs, mode='TF'):
+    """
+    Args:
+        tfr_bb_params: dict.
+            Parameters for the time-freuqncy analysis or for the processing 
+            of broadband data.
+        mode: str.
+            If 'TF' compute a time-frequency representation of the data before
+            computing source-space estimates. If 'BB' conduct sourse 
+            localisation of the broadband data. If 'BB' then tfr_params should
+            only have a single key, 'decim'.
+    """
     times = epochs[0].times    
-    return multi_apply_lcmv(epochs, times, filters, tfr_params)
+    return multi_apply_lcmv(epochs, times, filters, tfr_bb_params, mode=mode)
 
 
 class Decoder(object):
@@ -192,7 +203,8 @@ def categorize(clf, target, data, njobs=6):
     return score
 
 
-def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
+def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params, 
+                        max_ori_out="signed", mode='TF'):
     """Apply Linearly Constrained Minimum Variance (LCMV) beamformer weights.
 
 
@@ -204,27 +216,26 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
             Each element should be either n_trials x n_sensors x Y x n_time
             or trials x sensors x time. Reconstruction treats epochs and
             dim Y as independent dimensions.
-        est_key: value
-            A key to identify this reconstruction (e.g. F for power)
-        est_vals: sequence
-            Values that identify different reconstructions along dimension Y
-            for a single epoch, e.g. the frequency for power reconstructions.
-            Needs to be length Y.
-        events: list of ndarray
-            Identifiers for different epochs. Needs to be of length n_trials.
         times: array
             Time of entries in last dimension of input data.
-        infos: list of mne info structure
-            Info structure of the epochs which are to be reconstructed.
-            One element per element of tfrdata
         filters: list of filter dicts
             List of filter dicts, one for each element in tfrdata
-        
+        tfr_bb_params: dict.
+            Parameters for the time-freuqncy analysis or for the processing 
+            of broadband data.
+        mode: str.
+            If 'TF' compute a time-frequency representation of the data before
+            computing source-space estimates. If 'BB' conduct sourse 
+            localisation of the broadband data. If 'BB' then tfr_params should
+            only have a single key, 'decim'.
 
     Returns:
         ndarray of source reconstructed epochs, events, times, est_vals
     """
     from pymeg.lcmv import _apply_lcmv
+
+    if mode != 'TF':
+        assert list(tfr_params.keys()) == ['decim']
 
     results = []
     evs = []
@@ -234,14 +245,26 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
         info = epochs.info
         epochsChs = epochs.ch_names
 
-        epochs, tfrtimes, est_val, est_key = complex_tfr(
-            epochs._data[:,:,:], times, **tfr_params
-        )
+        if mode == 'TF':
+            epochs, times, est_val, est_key = complex_tfr(
+                epochs._data[:,:,:], times, **tfr_bb_params
+            )
+        elif mode == 'BB':
+            epochs = epochs._data[:, :, :]
+            epochs = epochs[:, :, np.newaxis, :]
+
+            assert len(times) == epochs.shape[3]
+            epochs = epochs[:, :, :, ::decim]
+            times = times[::decim]
+            assert len(times) == epochs.shape[3]
+            est_val = np.asarray(['BB'])
+        else:
+            raise ValueError('Option unrecognised')
 
         nfreqs = epochs.shape[2]
         with info._unlock():
-            info["sfreq"] = 1.0 / np.diff(tfrtimes)[0]
-        assert info["sfreq"] == (1.0 / np.diff(tfrtimes)[0])
+            info["sfreq"] = 1.0 / np.diff(times)[0]
+        assert info["sfreq"] == (1.0 / np.diff(times)[0])
         eres = []
         for freq in range(nfreqs):
             relKeys = list(flt.keys())
@@ -258,7 +281,7 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
                         data=epochs[:, :, freq, :],
                         filters=filter,
                         info=info,
-                        tmin=tfrtimes.min(),
+                        tmin=times.min(),
                         max_ori_out=max_ori_out,
                     )
                 ]
@@ -266,7 +289,7 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_params, max_ori_out="signed"):
 
             eres.append(data)
         results.append(np.stack(eres, 1))
-    return np.vstack(results), np.concatenate(evs), est_val, tfrtimes
+    return np.vstack(results), np.concatenate(evs), est_val, times
 
 
 def multiclass_roc(y_true, y_predict, **kwargs):
