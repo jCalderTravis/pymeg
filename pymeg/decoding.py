@@ -48,20 +48,21 @@ from pymeg.lcmv import complex_tfr, tfr2power_estimator
 njobs = 1
 
 
-def get_lcmv(tfr_bb_params, epochs, filters, njobs=njobs, mode='TF'):
+def get_lcmv(tfr_bb_params, epochs, filters, njobs=njobs, tfOrBb='TF'):
     """
     Args:
         tfr_bb_params: dict.
             Parameters for the time-freuqncy analysis or for the processing 
             of broadband data.
-        mode: str.
+        tfOrBb: str.
             If 'TF' compute a time-frequency representation of the data before
             computing source-space estimates. If 'BB' conduct sourse 
             localisation of the broadband data. If 'BB' then tfr_params should
-            only have a single key, 'decim'.
+            only have the keys 'foi',  'n_jobs', 'est_val', 'sf', and 'decim'.
     """
     times = epochs[0].times    
-    return multi_apply_lcmv(epochs, times, filters, tfr_bb_params, mode=mode)
+    return multi_apply_lcmv(epochs, times, filters, tfr_bb_params, 
+                            mode=tfOrBb)
 
 
 class Decoder(object):
@@ -226,8 +227,9 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
         mode: str.
             If 'TF' compute a time-frequency representation of the data before
             computing source-space estimates. If 'BB' conduct sourse 
-            localisation of the broadband data. If 'BB' then tfr_params should
-            only have a single key, 'decim'.
+            localisation of the broadband data. If 'BB' then tfr_bb_params 
+            should only have the keys 'foi',  'n_jobs', 'est_val', 'sf', and 
+            'decim'.
 
     Returns:
         ndarray of source reconstructed epochs, events, times, est_vals
@@ -235,7 +237,8 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
     from pymeg.lcmv import _apply_lcmv
 
     if mode != 'TF':
-        assert list(tfr_params.keys()) == ['decim']
+        assert list(tfr_bb_params.keys()) == ['foi',  'n_jobs', 'est_val', 
+                                           'sf', 'decim']
 
     results = []
     evs = []
@@ -256,19 +259,22 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
             epochs = epochs[:, :, np.newaxis, :]
 
             assert len(times) == epochs.shape[3]
+            decim = tfr_bb_params['decim']
             epochs = epochs[:, :, :, ::decim]
             newTimes = times[::decim]
             assert len(newTimes) == epochs.shape[3]
-            est_val = np.asarray(['BB'])
+            assert tfr_bb_params['est_val'] == tfr_bb_params['foi']
+            assert tfr_bb_params['est_val'] == ['BB']
+            est_val = np.asarray(tfr_bb_params['est_val'])
         else:
             raise ValueError('Option unrecognised')
 
-        if savedNewTime is not None:
+        if savedNewTimes is not None:
             assert np.array_equal(savedNewTimes, newTimes)
     
         nfreqs = epochs.shape[2]
         with info._unlock():
-            info["sfreq"] = 1.0 / np.diff(neTimes)[0]
+            info["sfreq"] = 1.0 / np.diff(newTimes)[0]
         assert info["sfreq"] == (1.0 / np.diff(newTimes)[0])
         eres = []
         for freq in range(nfreqs):
