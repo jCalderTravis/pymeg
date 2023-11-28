@@ -8,6 +8,7 @@ The idea is to couple source reconstruction with a decoding approach:
   1. Use lcmv.py to perform source reconstruction for one ROI.
   2. Here: Provide a custom accumulate function that performs decoding.
 """
+from copy import deepcopy
 import numpy as np
 import mne
 from functools import partial
@@ -247,7 +248,7 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
     for epochs, flt in zip(tfrdata, filters):
         assert len(flt) == 1
         evs.append(epochs.events[:, 2])
-        info = epochs.info
+        info = deepcopy(epochs.info)
         epochsChs = epochs.ch_names
 
         if mode == 'TF':
