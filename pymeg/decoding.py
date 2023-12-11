@@ -237,9 +237,16 @@ def multi_apply_lcmv(tfrdata, times, filters, tfr_bb_params,
     """
     from pymeg.lcmv import _apply_lcmv
 
-    if mode != 'TF':
-        assert list(tfr_bb_params.keys()) == ['foi',  'n_jobs', 'est_val', 
-                                           'sf', 'decim']
+    if mode == 'TF':
+        assert set(tfr_bb_params.keys()) == set(['foi', 'cycles', 
+                                                'time_bandwidth', 'n_jobs', 
+                                                'est_val', 'est_key',
+                                                'sf', 'decim'])
+    elif mode == 'BB':
+        assert set(tfr_bb_params.keys()) == set(['foi',  'n_jobs', 'est_val', 
+                                                'sf', 'decim'])
+    else:
+        raise ValueError('Unknown option')
 
     results = []
     evs = []
